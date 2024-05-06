@@ -2,5 +2,4 @@ lyzr-automata
 streamlit
 requests
 python-dotenv
-smtplib
 email
