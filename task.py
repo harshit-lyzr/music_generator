@@ -1,8 +1,10 @@
 from lyzr_automata import Task
 from lyzr_automata.ai_models.openai import OpenAIModel
 from emails import send_email
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 api = os.getenv("OPENAI_API_KEY")
 open_ai_text_completion_model = OpenAIModel(
     api_key=api,

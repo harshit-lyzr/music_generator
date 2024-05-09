@@ -6,14 +6,15 @@ from task import email_task
 from dotenv import load_dotenv
 from PIL import Image
 
-load_dotenv()
-api_key = os.getenv('SUNO_API_KEY')
 st.set_page_config(
     page_title="Lyzr Music Generator🎶🎸",
     layout="centered",  # or "wide"
     initial_sidebar_state="auto",
     page_icon="lyzr-logo-cut.png",
 )
+
+load_dotenv()
+api_key = st.sidebar.text_input("Enter Your SUNO API KEY here", type="password")
 
 st.markdown(
     """
@@ -82,28 +83,29 @@ tags = st.selectbox("Tags", options=tag_list)
 prompt = st.text_area("Enter Prompt")
 
 
-
 if st.button("Generate"):
+    if api_key == "":
+        st.error("Please Enter Your SUNO API KEY")
+    else:
+        songs_url = []
+        n = 0
+        while n < 4:
+            song_ids = get_song_id(title, tags, prompt)
 
-    songs_url = []
-    n = 0
-    while n < 4:
-        song_ids = get_song_id(title, tags, prompt)
+            for song_id in song_ids:
+                while True:
+                    songs = generate_song(song_id)
+                    if songs['status'] in ['streaming', 'complete']:
+                        songs_url.append(songs)
+                        n += 1
+                        break
+                    else:
+                        time.sleep(10)
 
-        for song_id in song_ids:
-            while True:
-                songs = generate_song(song_id)
-                if songs['status'] in ['streaming', 'complete']:
-                    songs_url.append(songs)
-                    n += 1
-                    break
-                else:
-                    time.sleep(10)
+        for s in songs_url:
+            st.audio(s['audio_url'])
 
-    for s in songs_url:
-        st.audio(s['audio_url'])
-
-    email_task(email)
+        email_task(email)
 
 
 
